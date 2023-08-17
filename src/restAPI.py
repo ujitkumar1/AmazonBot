@@ -6,7 +6,27 @@ from src.log import log
 
 
 class Order(Resource):
+    """
+    Represents an API resource for placing orders using AmazonPhoneSearch.
+    Supports both GET and POST methods for placing orders and user login.
+
+    Attributes:
+        username (str): User's username for authentication.
+        password (str): User's password for authentication.
+        driver_path (str): Path to the ChromeDriver executable.
+
+    Methods:
+        get(): Handles the GET request to place an order based on provided JSON data.
+        post(): Handles the POST request for user login and data processing.
+    """
+
     def get(self):
+        """
+        Handles the GET request for placing an order based on JSON data.
+
+        Returns:
+            dict: Response indicating whether the order was successfully placed.
+        """
         log.info("Order-GET METHOD Called")
 
         log.info("Fetching the Json Data")
@@ -25,6 +45,7 @@ class Order(Resource):
             log.error("Data Not in correct format")
             return {'Error': "Data not correct"}, 500
 
+        # Path to the ChromeDriver executable
         self.driver_path = "C:\Program Files (x86)\chromedriver.exe"
         try:
             log.info("Starting the Order Process")
@@ -41,6 +62,12 @@ class Order(Resource):
             }, 500
 
     def post(self):
+        """
+        Handles the POST request for user login and data processing.
+
+        Returns:
+            dict: Response indicating that the data has been received and processed.
+        """
         log.info("Order - POST METHOD - User Login")
         Order.username = request.json.get('username')
         Order.password = request.json.get('password')
