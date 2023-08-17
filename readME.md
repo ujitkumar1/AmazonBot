@@ -1,10 +1,10 @@
 API
+
 1. login
 2. Product det.
 3. Payment
 4. Status
 5. User details.
-
 
 Python code
 
@@ -12,15 +12,14 @@ Python code
 2. Review/rating
 3. Order place
 
-
 {
-    "start_price":10000.0,
-     "end_price": 20000.0,
-     "product_name" :"smartphone",
-     "product_company":"Samsung"
+"start_price":10000.0,
+"end_price": 20000.0,
+"product_name" :"smartphone",
+"product_company":"Samsung"
 }
 
 {
-    "username":"hello@gmail.com",
-    "password":"123"
+"username":"hello@gmail.com",
+"password":"123"
 }

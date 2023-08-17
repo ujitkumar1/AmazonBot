@@ -1,14 +1,16 @@
 import time
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 class AmazonPhoneSearch:
-    def __init__(self, uname,password,driver_path, start_price, end_price, product_name, product_company):
+    def __init__(self, uname, password, driver_path, start_price, end_price, product_name, product_company):
         self.driver_path = driver_path
         self.start_price = start_price
         self.end_price = end_price
@@ -39,7 +41,6 @@ class AmazonPhoneSearch:
         passwordO = self.driver.find_element(By.ID, "ap_password")
         passwordO.send_keys(self.password)
         passwordO.send_keys(Keys.RETURN)
-
 
     def search_product(self):
         print("Searching Product")
@@ -88,7 +89,8 @@ class AmazonPhoneSearch:
         self.driver.get("https://www.amazon.in" + var)
         try:
             WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.NAME, "submit.add-to-cart"))).click()
-            WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.ID, "attach-close_sideSheet-link"))).click()
+            WebDriverWait(self.driver, 30).until(
+                EC.element_to_be_clickable((By.ID, "attach-close_sideSheet-link"))).click()
             WebDriverWait(self.driver, 120).until(EC.element_to_be_clickable((By.ID, "nav-cart-count"))).click()
             print("Order Placed.....!")
             time.sleep(5)
@@ -107,13 +109,3 @@ class AmazonPhoneSearch:
             self.extract_and_process_data()
         finally:
             self.close_driver()
-
-# if __name__ == "__main__":
-#     driver_path = "C:\Program Files (x86)\chromedriver.exe"
-#     start_price = "10000"
-#     end_price = "20000"
-#     product_name = "smartphone"
-#     product_company = "Samsung"
-#
-#     search_instance = AmazonPhoneSearch(driver_path, start_price, end_price, product_name, product_company)
-#     search_instance.run()
