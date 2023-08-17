@@ -2,36 +2,48 @@ from flask import request
 from flask_restful import Resource
 
 from src.amazon import AmazonPhoneSearch
+from src.log import log
 
 
 class Order(Resource):
     def get(self):
+        log.info("Order-GET METHOD Called")
+
+        log.info("Fetching the Json Data")
         start_price = request.json.get('start_price')
         end_price = request.json.get('end_price')
         product_name = request.json.get('product_name')
         product_company = request.json.get('product_company')
+        log.info("Fetching Json Completed")
 
         if not all([start_price, end_price, product_company, product_name]):
+            log.error("Missing Data in Json Request")
             return {'Error': "Data missing"}, 500
 
         if not (type(start_price) == float and type(end_price) == float and type(product_name) == str and type(
                 product_company) == str):
+            log.error("Data Not in correct format")
             return {'Error': "Data not correct"}, 500
 
         self.driver_path = "C:\Program Files (x86)\chromedriver.exe"
-        print(self.username, self.password, self.driver_path, start_price, end_price, product_name, product_company)
         try:
-            print(self.username, self.password, self.driver_path, start_price, end_price, product_name, product_company)
+            log.info("Starting the Order Process")
             order = AmazonPhoneSearch(self.username, self.password, self.driver_path, start_price, end_price,
                                       product_name, product_company)
             order.run()
+
+            log.info("Order Placed - OrderID")
             return {"Order Placed": "OrderID"}, 200
-        except:
+        except Exception as e:
+            log.error("Exception ", e)
             return {
                 "Error": "Some error occ."
             }, 500
 
     def post(self):
+        log.info("Order - POST METHOD - User Login")
         Order.username = request.json.get('username')
         Order.password = request.json.get('password')
-        return ("Done...!")
+        log.info("Data Received")
+
+        return {"Message": "Data Received, Processed with Order in GET REQUEST"}

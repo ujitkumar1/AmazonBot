@@ -8,9 +8,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from src.log import log
+
 
 class AmazonPhoneSearch:
     def __init__(self, uname, password, driver_path, start_price, end_price, product_name, product_company):
+
+        log.info("AmazonPhoneSearch - __init__ method")
         self.driver_path = driver_path
         self.start_price = start_price
         self.end_price = end_price
@@ -21,51 +25,69 @@ class AmazonPhoneSearch:
         self.driver = self._initialize_driver()
 
     def _initialize_driver(self):
-        print("Initializing Drive")
+        log.info("Initializing Selenium Drive")
         service = Service(self.driver_path)
         options = webdriver.ChromeOptions()
         options.add_argument("--start-maximized")
         driver = webdriver.Chrome(service=service, options=options)
-        print("Initiation Done")
+        log.info("Initiation Done")
         return driver
 
     def login(self):
+        log.info("AmazonPhoneSearch - Login Method")
         self.sigin_url = "https://www.amazon.in/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.in%2F%3Fref_%3Dnav_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=inflex&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+
         self.driver.get(self.sigin_url)
 
-        unameO = self.driver.find_element(By.ID, "ap_email")
-        unameO.send_keys(self.uname)
-        unameO.send_keys(Keys.RETURN)
-        time.sleep(7)
+        try:
+            unameO = self.driver.find_element(By.ID, "ap_email")
+            unameO.send_keys(self.uname)
+            unameO.send_keys(Keys.RETURN)
+            time.sleep(7)
 
-        passwordO = self.driver.find_element(By.ID, "ap_password")
-        passwordO.send_keys(self.password)
-        passwordO.send_keys(Keys.RETURN)
+            passwordO = self.driver.find_element(By.ID, "ap_password")
+            passwordO.send_keys(self.password)
+            passwordO.send_keys(Keys.RETURN)
+
+            log.info("Login Successful")
+
+        except Exception as e:
+            log.error("Error Occurred", e)
 
     def search_product(self):
-        print("Searching Product")
-        self.driver.get("https://amazon.in")
-        search_bar = self.driver.find_element(By.ID, "twotabsearchtextbox")
-        search_bar.send_keys(self.product_name)
-        search_bar.send_keys(Keys.RETURN)
+        try:
+            log.info("Searching Product")
+            self.driver.get("https://amazon.in")
+            search_bar = self.driver.find_element(By.ID, "twotabsearchtextbox")
+            search_bar.send_keys(self.product_name)
+            search_bar.send_keys(Keys.RETURN)
+
+        except Exception as e:
+            log.error("Error Occurred", e)
 
     def apply_filters(self):
-        print("Applying Filter")
-        WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable((By.CLASS_NAME, "a-expander-prompt")))
-        brand_filter = WebDriverWait(self.driver, 60).until(
-            EC.element_to_be_clickable((By.XPATH, f"//*[@id='p_89/{self.product_company}']/span/a/div/label/input")))
-        self.driver.execute_script("arguments[0].click();", brand_filter)
+        log.info("Applying Filter")
 
-        low_price = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "low-price")))
-        high_price = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "high-price")))
+        try:
+            WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable((By.CLASS_NAME, "a-expander-prompt")))
+            brand_filter = WebDriverWait(self.driver, 60).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, f"//*[@id='p_89/{self.product_company}']/span/a/div/label/input")))
+            self.driver.execute_script("arguments[0].click();", brand_filter)
 
-        low_price.send_keys(self.start_price)
-        high_price.send_keys(self.end_price)
-        high_price.send_keys(Keys.RETURN)
-        print("Price range applied")
+            low_price = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "low-price")))
+            high_price = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "high-price")))
+
+            low_price.send_keys(self.start_price)
+            high_price.send_keys(self.end_price)
+            high_price.send_keys(Keys.RETURN)
+            log.info("Price range applied")
+
+        except Exception as e:
+            log.error("Error Occurred", e)
 
     def extract_and_process_data(self):
-        print("Extracting Data...!")
+        log.info("Extracting Data...!")
         time.sleep(5)
         url = self.driver.page_source
         soup = BeautifulSoup(url, "html.parser")
@@ -92,11 +114,10 @@ class AmazonPhoneSearch:
             WebDriverWait(self.driver, 30).until(
                 EC.element_to_be_clickable((By.ID, "attach-close_sideSheet-link"))).click()
             WebDriverWait(self.driver, 120).until(EC.element_to_be_clickable((By.ID, "nav-cart-count"))).click()
-            print("Order Placed.....!")
+            log.info("Order Placed.....!")
             time.sleep(5)
-        except:
-            print(Exception)
-            pass
+        except Exception as e:
+            log.error("Error Occurred", e)
 
     def close_driver(self):
         self.driver.quit()
