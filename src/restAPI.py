@@ -73,4 +73,4 @@ class Order(Resource):
         Order.password = request.json.get('password')
         log.info("Data Received")
 
-        return {"Message": "Data Received, Processed with Order in GET REQUEST"}
+        return {"Message": "Data Received, Proceed with Order in GET REQUEST"}
